@@ -1,0 +1,18 @@
+{
+  "name": "realtime-whiteboard",
+  "version": "1.0.0",
+  "description": "Multi-user real-time whiteboard with shared canvas. Node.js + Socket.io + HTML5 Canvas.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "engines": { "node": ">=18" },
+  "author": "Arjun Vashishtha",
+  "license": "MIT"
+}

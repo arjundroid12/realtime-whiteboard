@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-time Whiteboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <h1>🎨 Whiteboard</h1>
+    <div class="sidebar__section">
+      <label>Color</label>
+      <input type="color" id="colorPicker" value="#6366f1">
+    </div>
+    <div class="sidebar__section">
+      <label>Brush size: <span id="brushSizeValue">4</span>px</label>
+      <input type="range" id="brushSize" min="1" max="40" value="4">
+    </div>
+    <div class="sidebar__section">
+      <button id="undoBtn" class="btn">↶ Undo</button>
+      <button id="clearBtn" class="btn btn-danger">🗑 Clear</button>
+    </div>
+    <div class="sidebar__section">
+      <div class="status" id="status">connecting...</div>
+      <div class="users" id="users"></div>
+    </div>
+    <div class="sidebar__footer">
+      <p>Open this URL in another browser tab or share with friends to draw together in real time!</p>
+    </div>
+  </aside>
+  <main class="canvas-wrapper">
+    <canvas id="board"></canvas>
+  </main>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
