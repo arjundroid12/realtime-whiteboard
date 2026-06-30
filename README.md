@@ -18,7 +18,22 @@
 - **Auto-resize** — canvas fills the window
 - **Connection status indicator**
 
-## 🚀 Quick Start
+## 🚀 Live Demo
+
+This app requires a Node.js backend (Socket.io WebSockets), so it can't run on GitHub Pages or Surge.sh (which are static-only).
+
+### ⚡ One-Click Deploy to Render (free)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/arjundroid12/realtime-whiteboard)
+
+**Steps (~2 minutes):**
+1. Click the button above
+2. Sign in to Render with your GitHub account (no credit card needed)
+3. Click "Create Web Service" (defaults are pre-filled from `render.yaml`)
+4. Wait ~90 seconds for build & deploy
+5. Open the URL in 2 browser tabs to test multi-user drawing
+
+## 📦 Run Locally
 
 ```bash
 git clone https://github.com/arjundroid12/realtime-whiteboard.git
@@ -29,10 +44,6 @@ npm start
 ```
 
 **Test multi-user:** Open `http://localhost:3000` in two browser tabs. Draw in one — the other sees it instantly.
-
-## 🚢 Deploy
-
-**Render:** Push to GitHub → New Web Service → Build: `npm install`, Start: `npm start`
 
 ## 📡 How It Works
 
