@@ -1,4 +1,4 @@
-/* Real-time Whiteboard client */
+/* Real-time Whiteboard client (gracefully degrades to local mode when Socket.io is unavailable) */
 (() => {
   "use strict";
   const canvas = document.getElementById("board");
@@ -37,48 +37,45 @@
     if (history.length > MAX_HISTORY) history.shift();
   }
 
-  // Socket.io
-  const socket = io();
-
-  socket.on("connect", () => {
-    statusEl.textContent = "connected";
-    statusEl.classList.add("online");
-  });
-
-  socket.on("disconnect", () => {
-    statusEl.textContent = "disconnected";
-    statusEl.classList.remove("online");
-  });
-
-  socket.on("user:joined", updateUsers);
-  socket.on("user:left", updateUsers);
-
-  function updateUsers() {
-    // We don't have exact count from server without extra API call; just show "drawing together"
-    usersEl.textContent = "Multiple users may be drawing";
+  // Socket.io — optional. If unavailable (e.g. static hosting on Vercel), run in local mode.
+  let socket = null;
+  try {
+    if (typeof io !== "undefined") {
+      socket = io();
+      socket.on("connect", () => {
+        statusEl.textContent = "connected";
+        statusEl.classList.add("online");
+        usersEl.textContent = "Multiple users may be drawing";
+      });
+      socket.on("disconnect", () => {
+        statusEl.textContent = "disconnected";
+        statusEl.classList.remove("online");
+      });
+      socket.on("draw:stroke", (data) => {
+        drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+      });
+      socket.on("canvas:snapshot", (data) => {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0);
+        img.src = data.imageData;
+      });
+      socket.on("canvas:request-snapshot", (data) => {
+        socket.emit("canvas:snapshot", { to: data.to, imageData: canvas.toDataURL() });
+      });
+      socket.on("canvas:clear", () => {
+        saveSnapshot();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+    }
+  } catch (e) {
+    console.warn("Socket.io unavailable — running in local mode", e);
   }
 
-  // Receive drawing from others
-  socket.on("draw:stroke", (data) => {
-    drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
-  });
-
-  // Receive full canvas snapshot (for new users joining)
-  socket.on("canvas:snapshot", (data) => {
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0);
-    img.src = data.imageData;
-  });
-
-  // Someone requests our snapshot
-  socket.on("canvas:request-snapshot", (data) => {
-    socket.emit("canvas:snapshot", { to: data.to, imageData: canvas.toDataURL() });
-  });
-
-  socket.on("canvas:clear", () => {
-    saveSnapshot();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  });
+  if (!socket) {
+    statusEl.textContent = "local mode";
+    statusEl.classList.remove("online");
+    usersEl.textContent = "Single-user drawing canvas";
+  }
 
   // Drawing functions
   function drawLine(x1, y1, x2, y2, strokeColor, strokeSize) {
@@ -115,8 +112,9 @@
     e.preventDefault();
     const pos = getPos(e);
     drawLine(lastX, lastY, pos.x, pos.y, color, size);
-    // Broadcast to others
-    socket.emit("draw:stroke", { x1: lastX, y1: lastY, x2: pos.x, y2: pos.y, color, size });
+    if (socket) {
+      socket.emit("draw:stroke", { x1: lastX, y1: lastY, x2: pos.x, y2: pos.y, color, size });
+    }
     lastX = pos.x;
     lastY = pos.y;
   }
@@ -150,9 +148,9 @@
   });
 
   clearBtn.addEventListener("click", () => {
-    if (!confirm("Clear the entire canvas? Everyone will see this.")) return;
+    if (!confirm("Clear the entire canvas?")) return;
     saveSnapshot();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    socket.emit("canvas:clear");
+    if (socket) socket.emit("canvas:clear");
   });
 })();

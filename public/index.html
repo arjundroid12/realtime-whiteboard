@@ -24,18 +24,17 @@
       <button id="clearBtn" class="btn btn-danger">🗑 Clear</button>
     </div>
     <div class="sidebar__section">
-      <div class="status" id="status">connecting...</div>
-      <div class="users" id="users"></div>
+      <div class="status" id="status">local mode</div>
+      <div class="users" id="users">Single-user drawing canvas</div>
     </div>
     <div class="sidebar__footer">
-      <p>Open this URL in another browser tab or share with friends to draw together in real time!</p>
+      <p>Drawing, color picker, brush size, undo, and clear all work locally. For real-time multi-user sync, run the Node.js + Socket.io server from the GitHub repo.</p>
     </div>
   </aside>
   <main class="canvas-wrapper">
     <canvas id="board"></canvas>
   </main>
 </div>
-<script src="/socket.io/socket.io.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>
